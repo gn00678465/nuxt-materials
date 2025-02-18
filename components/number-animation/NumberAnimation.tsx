@@ -88,16 +88,18 @@ export default defineComponent({
 
     const defaultFormat = (num: number, precision: number, options: FormatOptions): string => {
       const { thousandsSeparator = ',', decimalSeparator = '.' } = options
-      const rounded = Math.round(num * (10 ** precision)) / (10 ** precision)
-      const [integerPart, decimalPart = ''] = rounded.toString().split('.')
+
+      // 強制保留指定的小數位數
+      const fixed = num.toFixed(precision)
+      const [integerPart, decimalPart = '0'.repeat(precision)] = fixed.split('.')
 
       // 處理整數部分的千分位
       const formattedInteger = props.showSeparator
         ? integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator)
         : integerPart
 
-      // 如果有小數部分，加上小數分隔符
-      return decimalPart
+      // 如果 precision 為 0，不顯示小數部分
+      return precision > 0
         ? `${formattedInteger}${decimalSeparator}${decimalPart}`
         : formattedInteger
     }
