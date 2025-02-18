@@ -6,6 +6,8 @@ export interface FormatOptions {
   decimalSeparator?: string
 }
 
+export type Formatter = (value: number, precision: number) => string
+
 export const numberAnimationProps = {
   to: {
     type: Number,
@@ -34,6 +36,10 @@ export const numberAnimationProps = {
       thousandsSeparator: ',',
       decimalSeparator: '.'
     })
+  },
+  formatter: {
+    type: Function as PropType<Formatter>,
+    default: null
   },
   onFinish: Function as PropType<() => void>
 }
@@ -80,7 +86,7 @@ export default defineComponent({
       }
     }
 
-    const formatNumber = (num: number, precision: number, options: FormatOptions): string => {
+    const defaultFormat = (num: number, precision: number, options: FormatOptions): string => {
       const { thousandsSeparator = ',', decimalSeparator = '.' } = options
       const rounded = Math.round(num * (10 ** precision)) / (10 ** precision)
       const [integerPart, decimalPart = ''] = rounded.toString().split('.')
@@ -94,6 +100,19 @@ export default defineComponent({
       return decimalPart
         ? `${formattedInteger}${decimalSeparator}${decimalPart}`
         : formattedInteger
+    }
+
+    const formatNumber = (num: number, precision: number, options: FormatOptions): string => {
+      if (props.formatter) {
+        try {
+          return props.formatter(num, precision)
+        } catch (e) {
+          console.error('Custom formatter error:', e)
+          // 發生錯誤時降級使用預設格式化
+          return defaultFormat(num, precision, options)
+        }
+      }
+      return defaultFormat(num, precision, options)
     }
 
     const formattedValueRef = computed(() => {
