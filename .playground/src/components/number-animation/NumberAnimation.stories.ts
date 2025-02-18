@@ -16,7 +16,7 @@ const meta = {
     },
     precision: {
       control: { type: 'number', min: 0, max: 10 },
-      description: '小數位數'
+      description: '小數位數（設定後會強制顯示指定位數的小數）'
     },
     showSeparator: {
       control: 'boolean',
@@ -33,6 +33,10 @@ const meta = {
     formatOptions: {
       control: 'object',
       description: '格式化選項'
+    },
+    formatter: {
+      control: false,
+      description: '自定義格式化函數 (value: number, precision: number) => string，需確保返回值包含指定的小數位數'
     }
   }
 } satisfies Meta<typeof NumberAnimation>
@@ -43,14 +47,14 @@ type Story = StoryObj<typeof meta>
 // 基本用法
 export const Basic: Story = {
   args: {
-    to: 1234.56,
+    to: 123,
     precision: 2,
     showSeparator: true,
     active: true
   }
 }
 
-// 自定義格式化
+// 自定義格式化選項
 export const CustomFormat: Story = {
   args: {
     to: 9876543.21,
@@ -61,6 +65,61 @@ export const CustomFormat: Story = {
       decimalSeparator: ','
     },
     active: true
+  }
+}
+
+// 使用 Intl 格式化
+export const IntlFormat: Story = {
+  args: {
+    to: 1234567.89,
+    precision: 2,
+    active: true,
+    formatter: (value: number, precision: number) => {
+      if (typeof Intl === 'undefined') {
+        return value.toFixed(precision)
+      }
+      return new Intl.NumberFormat('zh-TW', {
+        minimumFractionDigits: precision,
+        maximumFractionDigits: precision
+      }).format(value)
+    }
+  }
+}
+
+// 貨幣格式化
+export const CurrencyFormat: Story = {
+  args: {
+    to: 9876.54,
+    precision: 2,
+    active: true,
+    formatter: (value: number, precision: number) => {
+      if (typeof Intl === 'undefined') {
+        return `$${value.toFixed(precision)}`
+      }
+      return new Intl.NumberFormat('zh-TW', {
+        style: 'currency',
+        currency: 'TWD',
+        minimumFractionDigits: precision,
+        maximumFractionDigits: precision
+      }).format(value)
+    }
+  }
+}
+
+// 整數顯示小數
+export const IntegerWithDecimals: Story = {
+  args: {
+    to: 123,
+    precision: 2,
+    showSeparator: true,
+    active: true
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '當設定 precision 時，即使是整數也會顯示指定位數的小數位'
+      }
+    }
   }
 }
 
