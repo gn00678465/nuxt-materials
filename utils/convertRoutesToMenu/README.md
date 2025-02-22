@@ -37,9 +37,6 @@ interface MenuConversionOptions<T> {
 
   // 轉換函數
   transform?: (route: RouteRecordRaw) => T
-
-  // 群組轉換函數
-  groupTransform?: (route: RouteRecordRaw, parentPath: string) => Omit<GroupMenuItem, 'type'> | null
 }
 ```
 
@@ -87,40 +84,6 @@ const routes = [
 
 const menu = convertRoutesToMenu(routes)
 ```
-
-### 使用群組
-
-```typescript
-const routes = [
-  {
-    path: '/features',
-    name: 'Features',
-    meta: { title: 'Features', isGroup: true },
-    children: [
-      {
-        path: 'basic',
-        name: 'BasicFeatures',
-        meta: { title: 'Basic Features' }
-      }
-    ]
-  }
-]
-
-const menu = convertRoutesToMenu(routes, {
-  groupTransform: (route, parentPath) => {
-    if (route.meta?.isGroup) {
-      return {
-        path: parentPath ? joinPaths(parentPath, route.path) : route.path,
-        name: route.name as string,
-        title: route.meta.title as string,
-        meta: route.meta
-      }
-    }
-    return null
-  }
-})
-```
-
 ### 自定義轉換
 
 ```typescript

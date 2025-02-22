@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { RouteRecordRaw } from 'vue-router'
-import { convertRoutesToMenu, joinPaths } from '.'
-import type { BaseMenuItem, GroupMenuItem } from './types'
+import { convertRoutesToMenu } from '.'
+import type { BaseMenuItem } from './types'
 
 const DummyComponent = { template: '<div>Dummy</div>' }
 
@@ -160,14 +160,14 @@ describe('convertRoutesToMenu', () => {
       }
     ]
 
-    type CustomMenu = {
+    interface CustomMenu {
       key: string
       label: string
       icon?: string
     }
 
     const result = convertRoutesToMenu<CustomMenu>(routes, {
-      transform: (route: RouteRecordRaw) => ({
+      transform: (route: RouteRecordRaw): CustomMenu => ({
         key: route.path,
         label: route.meta?.title as string,
         icon: route.meta?.icon as string
@@ -236,7 +236,7 @@ describe('convertRoutesToMenu', () => {
       }
     ]
 
-    type CustomMenu = {
+    interface CustomMenu {
       key: string
       label: string
     }
@@ -244,7 +244,7 @@ describe('convertRoutesToMenu', () => {
     const result = convertRoutesToMenu<CustomMenu>(routes, {
       sort: (a: RouteRecordRaw, b: RouteRecordRaw) =>
         ((a.meta?.order as number) || 0) - ((b.meta?.order as number) || 0),
-      transform: (route: RouteRecordRaw) => ({
+      transform: (route: RouteRecordRaw): CustomMenu => ({
         key: route.path,
         label: route.meta?.title as string
       })
@@ -262,209 +262,77 @@ describe('convertRoutesToMenu', () => {
     ])
   })
 
-  it('should handle group menu items', () => {
+  it('should handle group routes and apply custom transformation', () => {
     const routes: RouteRecordRaw[] = [
       {
-        path: '/features',
-        name: 'Features',
+        path: '/settings',
+        name: 'Settings',
         component: DummyComponent,
-        meta: { title: 'Features', isGroup: true },
+        meta: { title: 'Settings', isGroup: true  },
         children: [
           {
-            path: 'basic',
-            name: 'BasicFeatures',
+            path: 'profile',
+            name: 'Profile',
             component: DummyComponent,
-            meta: { title: 'Basic Features' }
+            meta: { title: 'Profile Settings' }
           },
           {
-            path: 'advanced',
-            name: 'AdvancedFeatures',
+            path: 'security',
+            name: 'Security',
             component: DummyComponent,
-            meta: { title: 'Advanced Features' }
+            meta: { title: 'Security Settings' }
           }
         ]
       }
     ]
 
+    interface MenuItem {
+      key: string
+      label: string
+      icon?: string
+      children?: MenuItem[]
+    }
+
+    interface MenuGroup {
+      type: 'group',
+      key: string
+      label: string
+      icon?: string
+      children?: MenuItem[]
+    }
+
+    type MenuOptions = MenuItem | MenuGroup
+
     const result = convertRoutesToMenu(routes, {
-      groupTransform: (route, parentPath) => {
-        if (route.meta?.isGroup) {
-          return {
-            path: parentPath ? joinPaths(parentPath, route.path) : route.path,
-            name: route.name as string,
-            title: route.meta.title as string,
-            meta: route.meta
-          }
+      transform: (route: RouteRecordRaw): MenuOptions => {
+        return {
+          key: route.name as string,
+          label: route.meta?.title as string,
+          icon: route.meta?.icon as string,
+          ...(route.meta?.isGroup ? { type: 'group' } : {}),
         }
-        return null
       }
     })
-
     expect(result).toEqual([
       {
         type: 'group',
-        path: '/features',
-        name: 'Features',
-        title: 'Features',
-        meta: { title: 'Features', isGroup: true },
+        "key": "Settings",
+        label: 'Settings',
+        icon: undefined,
         children: [
           {
-            path: '/features/basic',
-            name: 'BasicFeatures',
-            title: 'Basic Features',
-            meta: { title: 'Basic Features' }
+            "key": "Profile",
+            label: 'Profile Settings',
+            icon: undefined
           },
           {
-            path: '/features/advanced',
-            name: 'AdvancedFeatures',
-            title: 'Advanced Features',
-            meta: { title: 'Advanced Features' }
+            "key": "Security",
+            label: 'Security Settings',
+            icon: undefined
           }
         ]
       }
     ])
   })
 
-  it('should handle nested groups', () => {
-    const routes: RouteRecordRaw[] = [
-      {
-        path: '/admin',
-        name: 'Admin',
-        component: DummyComponent,
-        meta: { title: 'Admin', isGroup: true },
-        children: [
-          {
-            path: 'settings',
-            name: 'Settings',
-            component: DummyComponent,
-            meta: { title: 'Settings', isGroup: true },
-            children: [
-              {
-                path: 'system',
-                name: 'SystemSettings',
-                component: DummyComponent,
-                meta: { title: 'System Settings' }
-              }
-            ]
-          },
-          {
-            path: 'users',
-            name: 'Users',
-            component: DummyComponent,
-            meta: { title: 'Users' }
-          }
-        ]
-      }
-    ]
-
-    const result = convertRoutesToMenu(routes, {
-      groupTransform: (route, parentPath) => {
-        if (route.meta?.isGroup) {
-          return {
-            path: parentPath ? joinPaths(parentPath, route.path) : route.path,
-            name: route.name as string,
-            title: route.meta.title as string,
-            meta: route.meta
-          }
-        }
-        return null
-      }
-    })
-
-    expect(result).toEqual([
-      {
-        type: 'group',
-        path: '/admin',
-        name: 'Admin',
-        title: 'Admin',
-        meta: { title: 'Admin', isGroup: true },
-        children: [
-          {
-            type: 'group',
-            path: '/admin/settings',
-            name: 'Settings',
-            title: 'Settings',
-            meta: { title: 'Settings', isGroup: true },
-            children: [
-              {
-                path: '/admin/settings/system',
-                name: 'SystemSettings',
-                title: 'System Settings',
-                meta: { title: 'System Settings' }
-              }
-            ]
-          },
-          {
-            path: '/admin/users',
-            name: 'Users',
-            title: 'Users',
-            meta: { title: 'Users' }
-          }
-        ]
-      }
-    ])
-  })
-
-  it('should handle mixed menu items with groups and regular items', () => {
-    const routes: RouteRecordRaw[] = [
-      {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: DummyComponent,
-        meta: { title: 'Dashboard' }
-      },
-      {
-        path: '/management',
-        name: 'Management',
-        component: DummyComponent,
-        meta: { title: 'Management', isGroup: true },
-        children: [
-          {
-            path: 'projects',
-            name: 'Projects',
-            component: DummyComponent,
-            meta: { title: 'Projects' }
-          }
-        ]
-      }
-    ]
-
-    const result = convertRoutesToMenu(routes, {
-      groupTransform: (route, parentPath) => {
-        if (route.meta?.isGroup) {
-          return {
-            path: parentPath ? joinPaths(parentPath, route.path) : route.path,
-            name: route.name as string,
-            title: route.meta.title as string,
-            meta: route.meta
-          }
-        }
-        return null
-      }
-    })
-
-    expect(result).toEqual([
-      {
-        path: '/dashboard',
-        name: 'Dashboard',
-        title: 'Dashboard',
-        meta: { title: 'Dashboard' }
-      },
-      {
-        type: 'group',
-        path: '/management',
-        name: 'Management',
-        title: 'Management',
-        meta: { title: 'Management', isGroup: true },
-        children: [
-          {
-            path: '/management/projects',
-            name: 'Projects',
-            title: 'Projects',
-            meta: { title: 'Projects' }
-          }
-        ]
-      }
-    ])
-  })
 })

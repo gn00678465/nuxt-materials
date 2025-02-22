@@ -4,19 +4,14 @@ export interface BaseMenuItem {
   path: string
   name: string
   title: string
-  children?: (BaseMenuItem | GroupMenuItem)[]
+  children?: BaseMenuItem[]
   meta?: {
     [key: string]: unknown
   }
   [key: string]: unknown
 }
 
-export interface GroupMenuItem extends Omit<BaseMenuItem, 'children'> {
-  type: 'group'
-  children?: unknown[]
-}
-
-export interface MenuConversionOptions<T> {
+export interface MenuConversionOptions<T = BaseMenuItem> {
   /**
    * Filter function to exclude routes from menu
    */
@@ -36,19 +31,11 @@ export interface MenuConversionOptions<T> {
   /**
    * Transform function to convert route to custom menu item type
    * This runs after sorting to ensure proper order is maintained
-   * If provided, the return value will completely replace the default menu item
    */
   transform?: (route: RouteRecordRaw) => T
-
-  /**
-   * Transform function to convert route to group menu item
-   * This runs after sorting and before regular transform
-   * If provided and returns a value, the route will be treated as a group
-   */
-  groupTransform?: (route: RouteRecordRaw, parentPath: string) => Omit<GroupMenuItem, 'type'> | null
 }
 
 export type ConvertRoutesToMenu = <T = BaseMenuItem>(
   routes: RouteRecordRaw[],
   options?: MenuConversionOptions<T>
-) => (T | GroupMenuItem)[]
+) => T[]

@@ -1,7 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { BaseMenuItem, GroupMenuItem, MenuConversionOptions, ConvertRoutesToMenu } from './types'
+import type { BaseMenuItem, MenuConversionOptions, ConvertRoutesToMenu } from './types'
 
-export function joinPaths(parentPath: string, childPath: string): string {
+function joinPaths(parentPath: string, childPath: string): string {
   const normalizedParent = parentPath.endsWith('/') ? parentPath.slice(0, -1) : parentPath
   const normalizedChild = childPath.startsWith('/') ? childPath.slice(1) : childPath
   return `${normalizedParent}/${normalizedChild}`
@@ -21,7 +21,7 @@ function processRoutes<T = BaseMenuItem>(
   routes: RouteRecordRaw[],
   options: MenuConversionOptions<T> = {},
   parentPath = ''
-): (T | GroupMenuItem)[] {
+): T[] {
   // First, filter routes if needed
   let processedRoutes = routes.filter(route => !options.filter || options.filter(route))
 
@@ -30,7 +30,7 @@ function processRoutes<T = BaseMenuItem>(
     processedRoutes.sort(options.sort)
   }
 
-  const result: (T | GroupMenuItem)[] = []
+  const result: T[] = []
 
   for (const route of processedRoutes) {
     // Handle flattening
@@ -42,38 +42,6 @@ function processRoutes<T = BaseMenuItem>(
       )
       result.push(...flattenedChildren)
       continue
-    }
-
-    // Check if route should be treated as a group
-    if (options.groupTransform) {
-      const groupItem = options.groupTransform(route, parentPath)
-      if (groupItem) {
-        const groupMenuItem: GroupMenuItem = {
-          ...groupItem,
-          path: parentPath ? joinPaths(parentPath, route.path) : route.path,
-          type: 'group'
-        }
-
-        // Process children if they exist
-        if (route.children?.length) {
-          const sortedChildren = [...route.children]
-          if (options.sort) {
-            sortedChildren.sort(options.sort)
-          }
-
-          const children = processRoutes(
-            sortedChildren,
-            options,
-            joinPaths(parentPath, route.path)
-          )
-          if (children.length) {
-            groupMenuItem.children = children
-          }
-        }
-
-        result.push(groupMenuItem)
-        continue
-      }
     }
 
     // Create menu item (transform after sorting)
@@ -92,10 +60,10 @@ function processRoutes<T = BaseMenuItem>(
       const children = processRoutes(
         sortedChildren,
         options,
-        joinPaths(parentPath, route.path)
+        route.path
       )
       if (children.length) {
-        ;(menuItem as any).children = children
+        ;(menuItem as unknown as BaseMenuItem).children = children as unknown as BaseMenuItem[]
       }
     }
 
