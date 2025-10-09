@@ -19,6 +19,7 @@ dist
 
 # VSCode
 .vscode/
+!.vscode/settings.json
 
 # JetBrains/WebStorm
 .idea/
