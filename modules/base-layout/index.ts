@@ -12,7 +12,7 @@ export default defineNuxtModule({
 
     addComponent({
       name: 'BaseLayout',
-      filePath: resolver.resolve('runtime/base-layout/index.vue'),
+      filePath: resolver.resolve('./runtime/index.vue'),
       kebabName: 'base-layout',
       pascalName: 'BaseLayout',
     })
