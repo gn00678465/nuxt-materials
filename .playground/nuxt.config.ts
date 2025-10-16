@@ -2,13 +2,13 @@ import { fileURLToPath } from 'node:url'
 
 export default defineNuxtConfig({
   extends: ['..'],
-  app: {
-    head: {
-      script: [
-        { src: 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4' }
-      ]
-    }
-  },
+  // app: {
+  //   head: {
+  //     script: [
+  //       { src: 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4' }
+  //     ]
+  //   }
+  // },
   modules: ['@nuxt/eslint'],
   css: ['~/styles/index.css'],
   eslint: {
