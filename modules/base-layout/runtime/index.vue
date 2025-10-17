@@ -84,28 +84,24 @@ const leftGapClass = computed(() => {
 const headerLeftGapClass = computed(() => (isVertical.value ? leftGapClass.value : ''));
 
 const footerLeftGapClass = computed(() => {
-  const condition1 = isVertical.value;
-  const condition2 = isHorizontal.value && isWrapperScroll.value && !props.fixedFooter;
-  const condition3 = Boolean(isHorizontal.value && props.rightFooter);
+  const shouldApplyGap = isVertical.value
+    || (isHorizontal.value && isWrapperScroll.value && !props.fixedFooter)
+    || (isHorizontal.value && props.rightFooter);
 
-  if (condition1 || condition2 || condition3) {
-    return leftGapClass.value;
-  }
-
-  return '';
+  return shouldApplyGap ? leftGapClass.value : '';
 });
 
 const siderPaddingClass = computed(() => {
-  let cls = '';
+  const classes = [];
 
   if (showHeader.value && !headerLeftGapClass.value) {
-    cls += style['sider-padding-top'];
+    classes.push(style['sider-padding-top']);
   }
   if (showFooter.value && !footerLeftGapClass.value) {
-    cls += ` ${style['sider-padding-bottom']}`;
+    classes.push(style['sider-padding-bottom']);
   }
 
-  return cls;
+  return classes.join(' ');
 });
 
 function handleClickMask() {
@@ -117,7 +113,12 @@ function handleClickMask() {
   <div :class="[style['layout-container'], commonClass]" :style="cssVars">
     <div
       :id="isWrapperScroll ? scrollElId : undefined"
-      :class="[style['scroll-wrapper'], commonClass, scrollWrapperClass, { [style['scroll-wrapper-scrollable']]: isWrapperScroll }]"
+      :class="[
+        style['scroll-wrapper'],
+        commonClass,
+        scrollWrapperClass,
+        isWrapperScroll && style['scroll-wrapper-scrollable']
+      ]"
     >
       <!-- Header -->
       <template v-if="showHeader">
@@ -129,14 +130,14 @@ function handleClickMask() {
             commonClass,
             headerClass,
             headerLeftGapClass,
-            { [style['layout-header-fixed']]: fixedHeaderAndTab }
+            fixedHeaderAndTab && style['layout-header-fixed']
           ]"
         >
           <slot name="header" />
         </header>
         <div
           v-show="!fullContent && fixedHeaderAndTab"
-          :class="[style['layout-header-placement']]"
+          :class="style['layout-header-placement']"
         />
       </template>
 
@@ -148,16 +149,16 @@ function handleClickMask() {
             style['layout-tab'],
             commonClass,
             tabClass,
-            { [style['layout-tab-top']]: fullContent || !showHeader },
+            (fullContent || !showHeader) && style['layout-tab-top'],
             leftGapClass,
-            { [style['layout-tab-fixed']]: fixedHeaderAndTab }
+            fixedHeaderAndTab && style['layout-tab-fixed']
           ]"
         >
           <slot name="tab" />
         </div>
         <div
           v-show="fullContent || fixedHeaderAndTab"
-          :class="[style['layout-tab-placement']]"
+          :class="style['layout-tab-placement']"
         />
       </template>
 
@@ -200,7 +201,13 @@ function handleClickMask() {
       <!-- Main Content -->
       <main
         :id="isContentScroll ? scrollElId : undefined"
-        :class="[style['layout-content'], commonClass, contentClass, leftGapClass, { [style['layout-content-scrollable']]: isContentScroll }]"
+        :class="[
+          style['layout-content'],
+          commonClass,
+          contentClass,
+          leftGapClass,
+          isContentScroll && style['layout-content-scrollable']
+        ]"
       >
         <slot />
       </main>
@@ -215,14 +222,14 @@ function handleClickMask() {
             commonClass,
             footerClass,
             footerLeftGapClass,
-            { [style['layout-footer-fixed']]: fixedFooter }
+            fixedFooter && style['layout-footer-fixed']
           ]"
         >
           <slot name="footer" />
         </footer>
         <div
           v-show="!fullContent && fixedFooter"
-          :class="[style['layout-footer-placement']]"
+          :class="style['layout-footer-placement']"
         />
       </template>
     </div>
