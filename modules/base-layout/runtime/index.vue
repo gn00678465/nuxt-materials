@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { VNode } from 'vue';
 import { computed } from 'vue';
 import type { BaseLayoutProps } from './types';
 import { LAYOUT_MAX_Z_INDEX, LAYOUT_SCROLL_EL_ID, createLayoutCssVars } from './helpers';
@@ -35,8 +36,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SlotFn = (props?: Record<string, unknown>) => any;
+type SlotFn = (props?: Record<string, unknown>) => VNode | VNode[];
 
 type Slots = {
   /** Main */
