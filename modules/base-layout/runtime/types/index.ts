@@ -195,7 +195,7 @@ export interface BaseLayoutProps
   /**
    * The common class of the layout
    *
-   * Is can be used to configure the transition animation
+   * It can be used to configure the transition animation
    *
    * @default 'transition-all-300'
    */

@@ -21,7 +21,7 @@ export default defineNuxtConfig({
     css: {
       modules: {
         generateScopedName: (name, filename) => {
-          // 使用檔案路徑和類名生成穩定的 hash
+          // Generate a stable hash using the file path and class name
           const path = filename.split('/').slice(-2).join('/').replace(/\.[^.]+$/, '')
           return `_${name}_${path.replace(/[^a-zA-Z0-9]/g, '_')}`
         }
