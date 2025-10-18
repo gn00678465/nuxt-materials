@@ -157,7 +157,7 @@ function handleClickMask() {
           <slot name="tab" />
         </div>
         <div
-          v-show="fullContent || fixedHeaderAndTab"
+          v-show="!fullContent && fixedHeaderAndTab"
           :class="style['layout-tab-placement']"
         />
       </template>

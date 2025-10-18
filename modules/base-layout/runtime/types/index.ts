@@ -168,7 +168,7 @@ export interface BaseLayoutProps
   /**
    * Scroll mode
    *
-   * - {@link ScrollMode}
+   * - {@link LayoutScrollMode}
    */
   scrollMode?: LayoutScrollMode;
   /**
