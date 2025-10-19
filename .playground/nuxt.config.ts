@@ -11,6 +11,9 @@ export default defineNuxtConfig({
       stylistic: true
     },
   },
+  materials: {
+    baseLayout: true
+  },
   vite: {
     css: {
       modules: {
