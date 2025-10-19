@@ -15,7 +15,7 @@ export default defineNuxtModule<ModuleOptions>({
   defaults: {
     baseLayout: true
   },
-  setup (moduleOptions) {
+  setup(moduleOptions) {
     const resolver = createResolver(import.meta.url)
 
     const enableBaseLayout = moduleOptions.baseLayout === true
@@ -28,6 +28,5 @@ export default defineNuxtModule<ModuleOptions>({
         pascalName: 'BaseLayout',
       })
     }
-
   },
 })
