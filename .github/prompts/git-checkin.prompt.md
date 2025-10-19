@@ -67,6 +67,7 @@ description: 'Git Commit Message Generator - Conventional Commits (繁體中文)
    - 或先將完整訊息寫入檔案，再用 -F 參數提交：
      `git commit -F commit-message.txt`
 6. 確認 commit 成功後回報結果
+7. 移除 commit-message.txt 檔案（如有使用）
 
 ## [EXAMPLES]
 ```
