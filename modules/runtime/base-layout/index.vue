@@ -139,7 +139,7 @@ function handleClickMask() {
         </header>
         <div
           v-show="!fullContent && fixedHeaderAndTab"
-          :class="'layout-header-placement'"
+          class="layout-header-placement"
         />
       </template>
 
@@ -160,7 +160,7 @@ function handleClickMask() {
         </div>
         <div
           v-show="!fullContent && fixedHeaderAndTab"
-          :class="'layout-tab-placement'"
+          class="layout-tab-placement"
         />
       </template>
 
@@ -231,7 +231,7 @@ function handleClickMask() {
         </footer>
         <div
           v-show="!fullContent && fixedFooter"
-          :class="'layout-footer-placement'"
+          class="layout-footer-placement"
         />
       </template>
     </div>
