@@ -9,11 +9,11 @@ export default defineNuxtModule<ModuleOptions>({
     name: '@nuxtjs/materials',
     configKey: 'materials',
     compatibility: {
-      nuxt: '^4.0.0'
+      nuxt: '^4.0.0',
     },
   },
   defaults: {
-    baseLayout: true
+    baseLayout: true,
   },
   setup(moduleOptions) {
     const resolver = createResolver(import.meta.url)
