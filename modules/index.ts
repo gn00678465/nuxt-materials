@@ -1,4 +1,4 @@
-import { addComponent, addPlugin, addTypeTemplate, createResolver, defineNuxtModule } from '@nuxt/kit'
+import { addComponent, addImports, createResolver, defineNuxtModule } from '@nuxt/kit'
 
 interface ModuleOptions {
   baseLayout?: boolean
@@ -33,29 +33,9 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     if (enableCircularReveal) {
-      addPlugin(resolver.resolve('./runtime/circular-reveal/plugin/index.ts'))
-
-      // 添加 circular-reveal 指令的型別聲明
-      addTypeTemplate({
-        filename: 'types/circular-reveal.d.ts',
-        getContents: () => `
-declare module '@vue/runtime-core' {
-  export interface GlobalDirectives {
-    vCircularReveal: {
-      /** 切換狀態的回調函式 */
-      toggle: () => void
-      /** 獲取當前狀態的函式 */
-      getCurrent: () => boolean
-      /** 動畫持續時間（毫秒），預設 500 */
-      duration?: number
-      /** 緩動函式，預設 'ease-in-out' */
-      easing?: string
-    }
-  }
-}
-
-export {}
-        `.trim(),
+      addImports({
+        name: 'useCircularReveal',
+        from: resolver.resolve('./runtime/circular-reveal/composables/useCircularReveal.ts'),
       })
     }
   },

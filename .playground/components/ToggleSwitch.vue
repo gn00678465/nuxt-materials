@@ -1,16 +1,21 @@
 <script setup lang="ts">
-
 const isDark = ref(false)
 
 const getCurrent = computed(() => {
   return isDark.value
 })
 
+const { handleClick } = useCircularReveal({
+  getCurrent: () => isDark.value,
+  toggle: handleToggle,
+})
+
 function handleToggle() {
   if (getCurrent.value) {
     document?.documentElement?.classList.remove('dark')
     isDark.value = false
-  } else {
+  }
+  else {
     document?.documentElement?.classList.add('dark')
     isDark.value = true
   }
@@ -27,14 +32,19 @@ onMounted(() => {
     document?.documentElement?.classList.add('dark')
   }
 })
-
 </script>
 
 <template>
-  <label v-circular-reveal="{ getCurrent: () => getCurrent, toggle: handleToggle }" class="ui-switch">
-    <input type="checkbox" :checked="isDark">
+  <label
+    class="ui-switch"
+    @click="handleClick"
+  >
+    <input
+      type="checkbox"
+      :checked="isDark"
+    >
     <div class="slider">
-      <div class="circle"/>
+      <div class="circle" />
     </div>
   </label>
 </template>
