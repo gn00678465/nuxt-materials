@@ -1,6 +1,13 @@
 import { fileURLToPath } from 'node:url'
 
 export default defineNuxtConfig({
+  app: {
+    head: {
+      meta: [
+        { name: 'color-scheme' , content: 'dark light' }
+      ]
+    }
+  },
   extends: ['..'],
   modules: ['@nuxt/eslint'],
   css: ['~/styles/index.css'],

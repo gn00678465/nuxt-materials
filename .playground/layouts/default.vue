@@ -1,7 +1,10 @@
 <template>
   <base-layout>
     <template #header>
-      <div>header</div>
+      <div class="header-content">
+        <span>header</span>
+        <ToggleSwitch />
+      </div>
     </template>
     <template #tab>
       <div>tab</div>
@@ -9,7 +12,7 @@
     <template #sider>
       <div>sider</div>
     </template>
-    <slot></slot>
+    <slot/>
     <template #footer>
       <div>footer</div>
     </template>
@@ -22,4 +25,12 @@
 
 <style scoped>
 
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  justify-content: space-between;
+  padding: 0 1rem 0 0;
+}
 </style>
