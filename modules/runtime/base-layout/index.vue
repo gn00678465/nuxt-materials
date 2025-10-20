@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import type { VNode } from 'vue';
-import { computed } from 'vue';
-import type { BaseLayoutProps } from './types';
-import { LAYOUT_MAX_Z_INDEX, LAYOUT_SCROLL_EL_ID, createLayoutCssVars } from './helpers';
-import style from './styles/index.module.css';
+import type { VNode } from 'vue'
+import { computed } from 'vue'
+import type { BaseLayoutProps } from './types'
+import { LAYOUT_MAX_Z_INDEX, LAYOUT_SCROLL_EL_ID, createLayoutCssVars } from './helpers'
 
 defineOptions({
-  name: 'BaseLayout'
-});
+  name: 'BaseLayout',
+})
 
 const props = withDefaults(defineProps<BaseLayoutProps>(), {
   mode: 'vertical',
@@ -26,98 +25,101 @@ const props = withDefaults(defineProps<BaseLayoutProps>(), {
   siderCollapsedWidth: 64,
   footerVisible: true,
   footerHeight: 48,
-  rightFooter: false
-});
+  rightFooter: false,
+})
 
 interface Emits {
   /** Update siderCollapse */
-  (e: 'update:siderCollapse', collapse: boolean): void;
+  (e: 'update:siderCollapse', collapse: boolean): void
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
-type SlotFn = (props?: Record<string, unknown>) => VNode | VNode[];
+type SlotFn = (props?: Record<string, unknown>) => VNode | VNode[]
 
 type Slots = {
   /** Main */
-  default?: SlotFn;
+  default?: SlotFn
   /** Header */
-  header?: SlotFn;
+  header?: SlotFn
   /** Tab */
-  tab?: SlotFn;
+  tab?: SlotFn
   /** Sider */
-  sider?: SlotFn;
+  sider?: SlotFn
   /** Footer */
-  footer?: SlotFn;
-};
+  footer?: SlotFn
+}
 
-const slots = defineSlots<Slots>();
+const slots = defineSlots<Slots>()
 
-const cssVars = computed(() => createLayoutCssVars(props));
+const cssVars = computed(() => createLayoutCssVars(props))
 
 // config visible
-const showHeader = computed(() => Boolean(slots.header) && props.headerVisible);
-const showTab = computed(() => Boolean(slots.tab) && props.tabVisible);
-const showSider = computed(() => !props.isMobile && Boolean(slots.sider) && props.siderVisible);
-const showMobileSider = computed(() => props.isMobile && Boolean(slots.sider) && props.siderVisible);
-const showFooter = computed(() => Boolean(slots.footer) && props.footerVisible);
+const showHeader = computed(() => Boolean(slots.header) && props.headerVisible)
+const showTab = computed(() => Boolean(slots.tab) && props.tabVisible)
+const showSider = computed(() => !props.isMobile && Boolean(slots.sider) && props.siderVisible)
+const showMobileSider = computed(() => props.isMobile && Boolean(slots.sider) && props.siderVisible)
+const showFooter = computed(() => Boolean(slots.footer) && props.footerVisible)
 
 // scroll mode
-const isWrapperScroll = computed(() => props.scrollMode === 'wrapper');
-const isContentScroll = computed(() => props.scrollMode === 'content');
+const isWrapperScroll = computed(() => props.scrollMode === 'wrapper')
+const isContentScroll = computed(() => props.scrollMode === 'content')
 
 // layout direction
-const isVertical = computed(() => props.mode === 'vertical');
-const isHorizontal = computed(() => props.mode === 'horizontal');
+const isVertical = computed(() => props.mode === 'vertical')
+const isHorizontal = computed(() => props.mode === 'horizontal')
 
-const fixedHeaderAndTab = computed(() => props.fixedTop || (isHorizontal.value && isWrapperScroll.value));
+const fixedHeaderAndTab = computed(() => props.fixedTop || (isHorizontal.value && isWrapperScroll.value))
 
 // css
 const leftGapClass = computed(() => {
   if (!props.fullContent && showSider.value) {
-    return props.siderCollapse ? style['left-gap_collapsed'] : style['left-gap'];
+    return props.siderCollapse ? 'left-gap_collapsed' : 'left-gap'
   }
 
-  return '';
-});
+  return ''
+})
 
-const headerLeftGapClass = computed(() => (isVertical.value ? leftGapClass.value : ''));
+const headerLeftGapClass = computed(() => (isVertical.value ? leftGapClass.value : ''))
 
 const footerLeftGapClass = computed(() => {
   const shouldApplyGap = isVertical.value
     || (isHorizontal.value && isWrapperScroll.value && !props.fixedFooter)
-    || (isHorizontal.value && props.rightFooter);
+    || (isHorizontal.value && props.rightFooter)
 
-  return shouldApplyGap ? leftGapClass.value : '';
-});
+  return shouldApplyGap ? leftGapClass.value : ''
+})
 
 const siderPaddingClass = computed(() => {
-  const classes = [];
+  const classes = []
 
   if (showHeader.value && !headerLeftGapClass.value) {
-    classes.push(style['sider-padding-top']);
+    classes.push('sider-padding-top')
   }
   if (showFooter.value && !footerLeftGapClass.value) {
-    classes.push(style['sider-padding-bottom']);
+    classes.push('sider-padding-bottom')
   }
 
-  return classes.join(' ');
-});
+  return classes.join(' ')
+})
 
 function handleClickMask() {
-  emit('update:siderCollapse', true);
+  emit('update:siderCollapse', true)
 }
 </script>
 
 <template>
-  <div :class="[style['layout-container'], commonClass]" :style="cssVars">
+  <div
+    :class="['layout-container', commonClass]"
+    :style="cssVars"
+  >
     <div
       :id="isWrapperScroll ? scrollElId : undefined"
       :class="[
-        style['scroll-wrapper'],
+        'scroll-wrapper',
         commonClass,
         scrollWrapperClass,
-        isWrapperScroll && style['scroll-wrapper-scrollable']
+        isWrapperScroll && 'scroll-wrapper-scrollable',
       ]"
     >
       <!-- Header -->
@@ -125,19 +127,19 @@ function handleClickMask() {
         <header
           v-show="!fullContent"
           :class="[
-            style['layout-header-base'],
-            style['layout-header'],
+            'layout-header-base',
+            'layout-header',
             commonClass,
             headerClass,
             headerLeftGapClass,
-            fixedHeaderAndTab && style['layout-header-fixed']
+            fixedHeaderAndTab && 'layout-header-fixed',
           ]"
         >
           <slot name="header" />
         </header>
         <div
           v-show="!fullContent && fixedHeaderAndTab"
-          :class="style['layout-header-placement']"
+          class="layout-header-placement"
         />
       </template>
 
@@ -145,20 +147,20 @@ function handleClickMask() {
       <template v-if="showTab">
         <div
           :class="[
-            style['layout-tab-base'],
-            style['layout-tab'],
+            'layout-tab-base',
+            'layout-tab',
             commonClass,
             tabClass,
-            (fullContent || !showHeader) && style['layout-tab-top'],
+            (fullContent || !showHeader) && 'layout-tab-top',
             leftGapClass,
-            fixedHeaderAndTab && style['layout-tab-fixed']
+            fixedHeaderAndTab && 'layout-tab-fixed',
           ]"
         >
           <slot name="tab" />
         </div>
         <div
           v-show="!fullContent && fixedHeaderAndTab"
-          :class="style['layout-tab-placement']"
+          class="layout-tab-placement"
         />
       </template>
 
@@ -167,11 +169,11 @@ function handleClickMask() {
         <aside
           v-show="!fullContent"
           :class="[
-            style['layout-sider-base'],
+            'layout-sider-base',
             commonClass,
             siderClass,
             siderPaddingClass,
-            siderCollapse ? style['layout-sider_collapsed'] : style['layout-sider']
+            siderCollapse ? 'layout-sider_collapsed' : 'layout-sider',
           ]"
         >
           <slot name="sider" />
@@ -182,18 +184,18 @@ function handleClickMask() {
       <template v-if="showMobileSider">
         <aside
           :class="[
-            style['layout-mobile-sider-base'],
+            'layout-mobile-sider-base',
             commonClass,
             mobileSiderClass,
-            style['layout-mobile-sider'],
-            siderCollapse ? style['layout-mobile-sider-hidden'] : style['layout-sider']
+            'layout-mobile-sider',
+            siderCollapse ? 'layout-mobile-sider-hidden' : 'layout-sider',
           ]"
         >
           <slot name="sider" />
         </aside>
         <div
           v-show="!siderCollapse"
-          :class="[style['layout-mobile-sider-mask-base'], style['layout-mobile-sider-mask']]"
+          :class="['layout-mobile-sider-mask-base', 'layout-mobile-sider-mask']"
           @click="handleClickMask"
         />
       </template>
@@ -202,11 +204,11 @@ function handleClickMask() {
       <main
         :id="isContentScroll ? scrollElId : undefined"
         :class="[
-          style['layout-content'],
+          'layout-content',
           commonClass,
           contentClass,
           leftGapClass,
-          isContentScroll && style['layout-content-scrollable']
+          isContentScroll && 'layout-content-scrollable',
         ]"
       >
         <slot />
@@ -217,23 +219,23 @@ function handleClickMask() {
         <footer
           v-show="!fullContent"
           :class="[
-            style['layout-footer-base'],
-            style['layout-footer'],
+            'layout-footer-base',
+            'layout-footer',
             commonClass,
             footerClass,
             footerLeftGapClass,
-            fixedFooter && style['layout-footer-fixed']
+            fixedFooter && 'layout-footer-fixed',
           ]"
         >
           <slot name="footer" />
         </footer>
         <div
           v-show="!fullContent && fixedFooter"
-          :class="style['layout-footer-placement']"
+          class="layout-footer-placement"
         />
       </template>
     </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped src="./styles/index.css" />
